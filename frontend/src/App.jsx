@@ -6,16 +6,24 @@ function App() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState(0);
-  //const [data, setData] = useState(null);
-
-  const fetchApi = async () => {
-    const d = await axios.get("/api/something");
-    console.log(d);
-  };
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     fetchApi();
-  }, []);
+  }, [data]);
+
+  const saveData = async () => {
+    await axios.post("http://localhost:3200/add", {
+      name,
+      email,
+      age,
+    });
+  };
+
+  const fetchApi = async () => {
+    const response = await axios.get("http://localhost:3200/allusers");
+    setData(response.data);
+  };
 
   return (
     <div className="container">
@@ -43,11 +51,31 @@ function App() {
             onChange={(e) => setAge(e.target.value)}
           />
         </div>
-        <button className="btn" onClick={() => dataHandler()}>
+        <button
+          className="btn"
+          onClick={() => {
+            saveData();
+            setAge(0);
+            setName("");
+            setEmail("");
+          }}
+        >
           {" "}
           Send Data
         </button>
-        <div className="Recorded Data"> </div>
+      </div>
+      <div className="Recorded Data">
+        <h2>Recorded Users From Database</h2>
+        <ul>
+          {data.map((d, id) => (
+            <>
+              <li key={id}>
+                {" "}
+                {d.name} | {d.email} | {d.age}
+              </li>
+            </>
+          ))}
+        </ul>
       </div>
     </div>
   );
